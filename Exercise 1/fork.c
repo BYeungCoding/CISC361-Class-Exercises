@@ -5,23 +5,23 @@
 #include <unistd.h>
 
 int main() {
-    int parent,a,b;
+    pid_t child_pid, grandchild_pid;
+    int status;
 
-    parent = getpid();
-    fork();
-    a = getpid();
-    if( a==parent )
-    {
-        printf("I am the parent: %d\n",parent);
+    child_pid = fork();
+
+    if (child_pid == 0) {
+        grandchild_pid = fork();
+        if (grandchild_pid == 0) {
+            printf("I am the grandchild (%d)\n", getpid());
+        } else {
+            wait(&status);
+            printf("I am the child (%d)\n", getpid());
+        }
+    } else {
+        wait(&status);
+        printf("I am the parent (%d)\n", getpid());
     }
-    else
-    {
-        fork();
-        b = getpid();
-        if( a==b )
-            printf("I am the child: %d\n",a);
-        else
-            printf("I am the grandchild: %d\n",b);
-    }
+
     return 0;
 }
